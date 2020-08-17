@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es6",
+    "sourceMap": true,
+    "jsx": "react",
+    "lib": [
+      "ES2015",
+      "ES2016",
+      "ES2017",
+      "DOM"
+    ],
+    "typeRoots": [
+      "./node_modules/@types/"
+    ],
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "strictNullChecks": false,
+    "strict": true,
+    "rootDir": "src",
+    "baseUrl": "./",
+    "paths": {
+      "@/*": [
+        "src/renderer/*"
+      ],
+      "@@/*": [
+        "src/*"
+      ]
+    }
+  },
+  "typings": "./src/typing.d.ts",
+  "exclude": [
+    "node_modules"
+  ]
+}
