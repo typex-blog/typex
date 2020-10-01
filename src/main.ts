@@ -1,10 +1,21 @@
 import { app, BrowserWindow } from 'electron';
 import * as sourceMapSupport from 'source-map-support';
+import * as express from 'express';
 import * as path from 'path';
 
 sourceMapSupport.install();
 
 // import * as path from "path";
+
+async function createServer() {
+  const app = express();
+  app.get('/preload.js', (req, res) => {
+    res.send(`
+    console.log('hello preload');
+    `);
+  });
+  app.listen(8850);
+}
 
 async function createWindow() {
   // Create the browser window.
@@ -37,6 +48,12 @@ app.on("ready", () => {
   createWindow().then(() => {
     console.log('create window finished!!');
   });
+
+  createServer().then(() => {
+    console.log('create server finished!!');
+  }).catch((err) => {
+    console.log(err);
+  })
 
   app.on("activate", function () {
     // On macOS it's common to re-create a window in the app when the

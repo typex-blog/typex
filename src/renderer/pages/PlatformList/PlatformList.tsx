@@ -23,6 +23,7 @@ import imgCnblogs from '@/assets/img/cnblogs-logo.gif';
 import imgV2ex from '@/assets/img/v2ex-logo.jpg';
 import imgWechat from '@/assets/img/wechat-logo.jpg';
 import { ImportOutlined, KeyOutlined } from '@ant-design/icons/lib';
+import { openGetTokenWindow } from '@@/bridge/browser';
 
 export interface PlatformListProps extends ConnectProps {
   platform: PlatformModelState;
@@ -81,6 +82,41 @@ const PlatformList: React.FC<PlatformListProps> = props => {
         payload: false,
       });
     }
+  };
+
+  const loadCookies = (d: Platform) => {
+    return async () => {
+      await openGetTokenWindow(d.url, `
+
+      // inject some js code
+      const ipcRenderer = require('electron').ipcRenderer;
+      ipcRenderer.on('intercept-request', (event, details) => {
+        console.log(details);
+        console.log('login finished');
+        const searchUserMenuList = document.querySelector('.user-dropdown-list');
+        if (searchUserMenuList) {
+          console.log('login success');
+        } else {
+          console.log('login failed');
+        }
+      })
+      document.addEventListener('click', (event) => {
+        console.log(event.target);
+        if (event.target.classList.contains('login-button')) {
+          console.log('start login');
+        }
+        
+        if (event.target.classList.contains('btn')) {
+          const searchAuthForm = document.querySelector('.auth-form');
+          if (searchAuthForm.contains(event.target)) {
+            console.log('confirm login');
+          }
+        }
+      });
+
+      console.log('hello inject')
+      `);
+    };
   };
 
   const onFetch: Function = (d: Platform) => {
@@ -278,6 +314,16 @@ const PlatformList: React.FC<PlatformListProps> = props => {
       render: (text: string, d: Platform) => {
         return (
           <div>
+            <Tooltip title="导入Cookies">
+              <Button
+                disabled={ d.loggedIn }
+                type="primary"
+                shape="circle"
+                icon={<ImportOutlined />}
+                className="fetchBtn"
+                onClick={ loadCookies(d) }
+              />
+            </Tooltip>
             <Tooltip title="导入文章">
               <Button
                 disabled={ !d.enableImport }
